@@ -29,7 +29,6 @@ $limiter->setRateLimit(10, 30)
     ->setStorageKey('api:limit:%s')
     ->setIdentifier(100);
 
-
 if ($limiter->hasExceededRateLimit()) {
     // Too many requests has been made, display error message
 } else {
