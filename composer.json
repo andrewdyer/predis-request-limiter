@@ -2,6 +2,7 @@
     "name": "andrewdyer/predis-request-limiter",
     "description": "Request rate limiting for Predis.",
     "type": "library",
+    "keywords": ["php", "redis", "predis", "rate-limit", "framework-agnostic"],
     "license": "MIT",
     "authors": [
         {
