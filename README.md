@@ -1,5 +1,13 @@
 # Predis Request Limiter
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a360f55ae33c445587e9a66eb4ccb115)](https://www.codacy.com/app/andrewdyer/predis-request-limiter?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=andrewdyer/predis-request-limiter&amp;utm_campaign=Badge_Grade)
+[![Latest Stable Version](https://poser.pugx.org/andrewdyer/predis-request-limiter/v/stable)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
+[![Total Downloads](https://poser.pugx.org/andrewdyer/predis-request-limiter/downloads)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
+[![Daily Downloads](https://poser.pugx.org/andrewdyer/predis-request-limiter/d/daily)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
+[![Monthly Downloads](https://poser.pugx.org/andrewdyer/predis-request-limiter/d/monthly)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
+[![Latest Unstable Version](https://poser.pugx.org/andrewdyer/predis-request-limiter/v/unstable)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
+[![License](https://poser.pugx.org/andrewdyer/predis-request-limiter/license)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
+
 Request rate limiting for Predis.
 
 ## License
