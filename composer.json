@@ -1,0 +1,35 @@
+{
+    "name": "andrewdyer/predis-request-limiter",
+    "description": "Request rate limiting for Predis.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Andrew Dyer",
+            "email": "andrewdyer@outlook.com",
+            "homepage": "http://andrewdyer.rocks",
+            "role": "developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "predis/predis": "^1.1"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^4.2",
+        "friendsofphp/php-cs-fixer": "^2.14"
+    },
+    "autoload": {
+        "psr-4": {
+            "Anddye\\PredisRequestLimiter\\": "src/"
+        }
+    },
+    "scripts": {
+        "cs": [
+            "vendor/bin/php-cs-fixer fix"
+        ],
+        "check": [
+            "composer cs"
+        ]
+    }
+}
