@@ -8,7 +8,7 @@
 [![Latest Unstable Version](https://poser.pugx.org/andrewdyer/predis-request-limiter/v/unstable)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
 [![License](https://poser.pugx.org/andrewdyer/predis-request-limiter/license)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
 
-Request rate limiting for Predis.
+Request rate limiting using Predis.
 
 ## License
 
