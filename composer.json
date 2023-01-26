@@ -18,11 +18,17 @@
     },
     "require-dev": {
         "symfony/var-dumper": "^4.2",
-        "friendsofphp/php-cs-fixer": "^2.14"
+        "friendsofphp/php-cs-fixer": "^2.14",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
             "Anddye\\PredisRequestLimiter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Anddye\\PredisRequestLimiter\\Tests\\": "tests/"
         }
     },
     "scripts": {
