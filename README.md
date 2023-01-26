@@ -1,14 +1,12 @@
-# Predis Request Limiter
+<h1 align="center">Predis Request Limiter</h1>
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a360f55ae33c445587e9a66eb4ccb115)](https://www.codacy.com/app/andrewdyer/predis-request-limiter?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=andrewdyer/predis-request-limiter&amp;utm_campaign=Badge_Grade)
-[![Latest Stable Version](https://poser.pugx.org/andrewdyer/predis-request-limiter/v/stable)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
-[![Total Downloads](https://poser.pugx.org/andrewdyer/predis-request-limiter/downloads)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
-[![Daily Downloads](https://poser.pugx.org/andrewdyer/predis-request-limiter/d/daily)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
-[![Monthly Downloads](https://poser.pugx.org/andrewdyer/predis-request-limiter/d/monthly)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
-[![Latest Unstable Version](https://poser.pugx.org/andrewdyer/predis-request-limiter/v/unstable)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
-[![License](https://poser.pugx.org/andrewdyer/predis-request-limiter/license)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
+<p align="center">Request rate limiting using Predis.</p>
 
-Request rate limiting using Predis.
+<p align="center">
+    <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/downloads?style=for-the-badge" alt="Total Downloads"></a>
+    <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/v?style=for-the-badge" alt="Latest Stable Version"></a>
+    <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/license?style=for-the-badge" alt="License"></a>
+</p>
 
 ## License
 
@@ -24,18 +22,12 @@ composer require andrewdyer/predis-request-limiter
 
 ```php
 // Create new predis client instance
-$predis = new Predis\Client([
-    'scheme' => 'tcp',
-    'host' => getenv('REDIS_HOST'),
-    'port' => getenv('REDIS_PORT'),
-    'password' => getenv('REDIS_PASSWORD')
-]);
+$predis = new Predis\Client();
 
 // Create new limiter instance
-$limiter = new Anddye\PredisRequestLimiter\Limiter($predis);
+$limiter = new Anddye\PredisRequestLimiter\Limiter($predis, 100);
 $limiter->setRateLimit(10, 30)
-    ->setStorageKey('api:limit:%s')
-    ->setIdentifier(100);
+    ->setStorageKey('api:limit:%s');
 
 if ($limiter->hasExceededRateLimit()) {
     // Too many requests has been made, display error message
@@ -56,4 +48,4 @@ If you're using this package, I'd love to hear your thoughts!
 
 *   [Redis](http://redis.io/)
 *   [Predis](https://github.com/nrk/predis)
-*   [Predis Adaptor](https://github.com/andrewdyer/predis-adaptor)
+*   [Predis Adaptor](https://github.com/andrewdyer/predis-request-limiter)
