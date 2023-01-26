@@ -7,9 +7,7 @@
     "authors": [
         {
             "name": "Andrew Dyer",
-            "email": "andrewdyer@outlook.com",
-            "homepage": "http://andrewdyer.rocks",
-            "role": "developer"
+            "email": "andrewdyer@outlook.com"
         }
     ],
     "require": {
@@ -17,8 +15,6 @@
         "predis/predis": "^2.1"
     },
     "require-dev": {
-        "symfony/var-dumper": "^4.2",
-        "friendsofphp/php-cs-fixer": "^2.14",
         "phpunit/phpunit": "^9.5"
     },
     "autoload": {
