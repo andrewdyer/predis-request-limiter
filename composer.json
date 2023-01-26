@@ -10,13 +10,6 @@
             "email": "andrewdyer@outlook.com"
         }
     ],
-    "require": {
-        "php": "^7.2 || ^8.0",
-        "predis/predis": "^2.1"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^9.5"
-    },
     "autoload": {
         "psr-4": {
             "Anddye\\PredisRequestLimiter\\": "src/"
@@ -27,12 +20,11 @@
             "Anddye\\PredisRequestLimiter\\Tests\\": "tests/"
         }
     },
-    "scripts": {
-        "cs": [
-            "vendor/bin/php-cs-fixer fix"
-        ],
-        "check": [
-            "composer cs"
-        ]
+    "require": {
+        "php": "^7.2 || ^8.0",
+        "predis/predis": "^2.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
     }
 }
