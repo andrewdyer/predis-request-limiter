@@ -2,76 +2,80 @@
 
 namespace Anddye\PredisRequestLimiter;
 
-use Closure;
-use Predis\Client as Predis;
+use Predis\Client;
 
-/**
- * Class Limiter.
- *
- * @author Andrew Dyer <andrewdyer@outlook.com>
- */
 class Limiter
 {
     /**
-     * @var int the unique identifier to use within the storage key
+     * Client class used for connecting and executing commands on Redis.
      */
-    protected $identifier;
+    private Client $client;
 
     /**
-     * @var Closure the limit exceeded handler
+     * The unique identifier to use within the storage key.
      */
-    protected $limitExceededHandler;
+    private string $identifier;
 
     /**
-     * @var int the time limit that the defined requests can be made within
+     * The limit exceeded handler.
      */
-    protected $perSecond = 60;
+    private $limitExceededHandler;
 
     /**
-     * @var int requests that can be made as per the time limit
+     * The time limit that the defined requests can be made within.
      */
-    protected $requests = 30;
+    private int $perSecond = 60;
 
     /**
-     * @var string the storage key used for the Redis store
+     * Requests that can be made as per the time limit.
      */
-    protected $storageKey = 'rate:%s:requests';
+    private int $requests = 30;
 
     /**
-     * Limiter constructor.
-     *
-     * @param Predis $redis
+     * The storage key used for the Redis store.
      */
-    public function __construct(Predis $redis)
+    private string $storageKey = 'rate:%s:requests';
+
+    /**
+     * @param Client $client     client class used for connecting and executing commands on Redis
+     * @param string $identifier unique identifier to use within the storage key
+     */
+    public function __construct(Client $client, string $identifier)
     {
-        $this->redis = $redis;
-        $this->identifier = $this->getIdentifier();
+        $this->client = $client;
+        $this->identifier = $identifier;
     }
 
     /**
-     * Resolve the identifier used for checking requests.
-     *
-     * @param null $identifier
-     *
-     * @return mixed
+     * The default limit exceeded handler.
      */
-    public function getIdentifier($identifier = null)
+    public function defaultLimitExceededHandler(): callable
     {
-        if (null === $identifier) {
-            return $_SERVER['REMOTE_ADDR'];
-        }
-
-        return $identifier;
+        return function () {};
     }
 
     /**
-     * Get the rate limit response.
-     *
-     * @return Closure
+     * Get Client class used for connecting and executing commands on Redis.
      */
-    public function getLimitExceededHandler(): Closure
+    public function getClient(): Client
     {
-        if (null === $this->limitExceededHandler) {
+        return $this->client;
+    }
+
+    /**
+     * Get unique identifier to use within the storage key.
+     */
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * Get the limit exceeded handler.
+     */
+    public function getLimitExceededHandler(): callable
+    {
+        if (!$this->limitExceededHandler) {
             return $this->defaultLimitExceededHandler();
         }
 
@@ -79,23 +83,35 @@ class Limiter
     }
 
     /**
-     * Get the identifier for the Redis storage key.
-     *
-     * @return string
+     * Get the time limit that the defined requests can be made within.
+     */
+    public function getPerSecond(): int
+    {
+        return $this->perSecond;
+    }
+
+    /**
+     * Get requests that can be made as per the time limit.
+     */
+    public function getRequests(): int
+    {
+        return $this->requests;
+    }
+
+    /**
+     * Get storage key.
      */
     public function getStorageKey(): string
     {
-        return sprintf($this->storageKey, $this->identifier);
+        return sprintf($this->storageKey, $this->getIdentifier());
     }
 
     /**
      * Check if the rate limit has been exceeded.
-     *
-     * @return bool
      */
     public function hasExceededRateLimit(): bool
     {
-        if ($this->redis->get($this->getStorageKey()) >= $this->requests) {
+        if ($this->getClient()->get($this->getStorageKey()) >= $this->getRequests()) {
             return true;
         }
 
@@ -107,46 +123,28 @@ class Limiter
      */
     public function incrementRequestCount(): void
     {
-        $this->redis->incr($this->getStorageKey());
+        $this->getClient()->incr($this->getStorageKey());
 
-        $this->redis->expire($this->getStorageKey(), $this->perSecond);
+        $this->getClient()->expire($this->getStorageKey(), $this->getPerSecond());
     }
 
     /**
-     * Set the identifier used for checking requests.
+     * Set limit exceeded handler.
      *
-     * @param int $identifier
-     *
-     * @return Limiter
+     * @param callable $limitExceededHandler the limit exceeded handler
      */
-    public function setIdentifier(int $identifier): self
+    public function setLimitExceededHandler(callable $limitExceededHandler): self
     {
-        $this->identifier = $identifier;
+        $this->limitExceededHandler = $limitExceededHandler;
 
         return $this;
     }
 
     /**
-     * Set the handler for the limit being exceeded.
+     * Set rate limit.
      *
-     * @param callable $handler
-     *
-     * @return Limiter
-     */
-    public function setLimitExceededHandler(callable $handler): self
-    {
-        $this->limitExceededHandler = $handler;
-
-        return $this;
-    }
-
-    /**
-     * Set the limitations.
-     *
-     * @param int $requests
-     * @param int $perSecond
-     *
-     * @return Limiter
+     * @param int $requests  requests that can be made as per the time limit
+     * @param int $perSecond the time limit that the defined requests can be made within
      */
     public function setRateLimit(int $requests, int $perSecond): self
     {
@@ -157,26 +155,14 @@ class Limiter
     }
 
     /**
-     * Set the storage key to be used for Redis.
+     * set storage key.
      *
-     * @param string $storageKey
-     *
-     * @return Limiter
+     * @param string $storageKey the storage key used for the Redis store
      */
     public function setStorageKey(string $storageKey): self
     {
         $this->storageKey = $storageKey;
 
         return $this;
-    }
-
-    /**
-     * The default limit exceeded handler.
-     *
-     * @return Closure
-     */
-    private function defaultLimitExceededHandler(): Closure
-    {
-        return function () {};
     }
 }
