@@ -7,7 +7,8 @@
     "authors": [
         {
             "name": "Andrew Dyer",
-            "email": "andrewdyer@outlook.com"
+            "homepage": "https://andrewdyer.rocks",
+            "role": "developer"
         }
     ],
     "autoload": {
