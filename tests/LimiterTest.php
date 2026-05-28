@@ -1,36 +1,56 @@
 <?php
 
-namespace Anddye\PredisRequestLimiter\Tests;
+declare(strict_types=1);
 
-use Anddye\PredisRequestLimiter\Limiter;
+namespace AndrewDyer\PredisRequestLimiter\Tests;
+
+use AndrewDyer\PredisRequestLimiter\Limiter;
+use AndrewDyer\PredisRequestLimiter\Tests\Support\FakeClient;
 use PHPUnit\Framework\TestCase;
-use Predis\Client;
 
+/**
+ * Unit tests for Limiter.
+ */
 final class LimiterTest extends TestCase
 {
-    private Client $client;
+    /**
+     * The fake Predis client used across tests.
+     */
+    private FakeClient $client;
 
+    /**
+     * Sets up the test environment before each test.
+     */
     protected function setUp(): void
     {
-        $parameters = [
-            'scheme' => 'tcp',
-            'host' => '127.0.0.1',
-            'port' => '6379',
-            'password' => '',
-        ];
-
-        $this->client = new Client($parameters);
+        $this->client = new FakeClient();
         $this->client->flushall();
     }
 
-    public function testDefaultLimitExceededHandler(): void
+    /**
+     * Asserts that getLimitExceededHandler returns a callable when no custom handler has been set.
+     */
+    public function testGetLimitExceededHandlerReturnsDefaultWhenNoneSet(): void
     {
-        $limiter = new Limiter($this->client, 'test-default-limit-exceeded-handler');
+        $limiter = new Limiter($this->client, 'test-default-handler');
 
-        $this->assertEquals($limiter->defaultLimitExceededHandler(), $limiter->getLimitExceededHandler());
+        $this->assertIsCallable($limiter->getLimitExceededHandler());
     }
 
-    public function testHasExceededRateLimit(): void
+    /**
+     * Asserts that repeated calls to getLimitExceededHandler return the same callable instance.
+     */
+    public function testGetLimitExceededHandlerReturnsSameInstanceOnRepeatedCalls(): void
+    {
+        $limiter = new Limiter($this->client, 'test-same-handler-instance');
+
+        $this->assertSame($limiter->getLimitExceededHandler(), $limiter->getLimitExceededHandler());
+    }
+
+    /**
+     * Asserts that hasExceededRateLimit returns false while the request count is below the configured limit.
+     */
+    public function testHasExceededRateLimitReturnsFalseBeforeLimitReached(): void
     {
         $limiter = new Limiter($this->client, 'test-has-exceeded-rate-limit');
         $limiter->setRateLimit(3, 30);
@@ -40,64 +60,84 @@ final class LimiterTest extends TestCase
 
         $limiter->incrementRequestCount();
         $this->assertFalse($limiter->hasExceededRateLimit());
+    }
+
+    /**
+     * Asserts that hasExceededRateLimit returns true once the request count reaches the configured limit.
+     */
+    public function testHasExceededRateLimitReturnsTrueWhenLimitReached(): void
+    {
+        $limiter = new Limiter($this->client, 'test-has-exceeded-rate-limit');
+        $limiter->setRateLimit(3, 30);
 
         $limiter->incrementRequestCount();
+        $limiter->incrementRequestCount();
+        $limiter->incrementRequestCount();
+
         $this->assertTrue($limiter->hasExceededRateLimit());
     }
 
-    public function testIncrementRequestCount(): void
+    /**
+     * Asserts that incrementing the request count correctly updates the stored value.
+     */
+    public function testIncrementRequestCountUpdatesStoredValue(): void
     {
         $limiter = new Limiter($this->client, 'test-increment-request-count');
 
         $limiter->incrementRequestCount();
-        $this->assertEquals('1', $limiter->getClient()->get($limiter->getStorageKey()));
+        $this->assertSame('1', $limiter->getClient()->get($limiter->getStorageKey()));
 
         $limiter->incrementRequestCount();
-        $this->assertEquals('2', $limiter->getClient()->get($limiter->getStorageKey()));
+        $this->assertSame('2', $limiter->getClient()->get($limiter->getStorageKey()));
 
         $limiter->incrementRequestCount();
-        $this->assertEquals('3', $limiter->getClient()->get($limiter->getStorageKey()));
+        $this->assertSame('3', $limiter->getClient()->get($limiter->getStorageKey()));
     }
 
-    public function testSetIdentifier(): void
+    /**
+     * Asserts that getIdentifier returns the value passed to the constructor.
+     */
+    public function testGetIdentifierReturnsCorrectValue(): void
     {
-        $identifier = 'custom identifier';
+        $limiter = new Limiter($this->client, 'custom-identifier');
 
-        $limiter = new Limiter($this->client, $identifier);
-
-        $this->assertEquals($identifier, $limiter->getIdentifier());
+        $this->assertSame('custom-identifier', $limiter->getIdentifier());
     }
 
-    public function testSetLimitExceededHandler(): void
+    /**
+     * Asserts that setLimitExceededHandler stores and returns the given handler via getLimitExceededHandler.
+     */
+    public function testSetLimitExceededHandlerStoresAndReturnsHandler(): void
     {
-        $handler = function () {};
+        $handler = static function(): void {
+        };
 
         $limiter = new Limiter($this->client, 'test-set-limit-exceeded-handler');
         $limiter->setLimitExceededHandler($handler);
 
-        $this->assertEquals($handler, $limiter->getLimitExceededHandler());
+        $this->assertSame($handler, $limiter->getLimitExceededHandler());
     }
 
-    public function testSetRateLimit(): void
+    /**
+     * Asserts that setRateLimit stores the requests and perSecond values correctly.
+     */
+    public function testSetRateLimitStoresCorrectValues(): void
     {
-        $requests = 10;
-        $perSecond = 20;
-
         $limiter = new Limiter($this->client, 'test-set-rate-limit');
-        $limiter->setRateLimit($requests, $perSecond);
+        $limiter->setRateLimit(10, 20);
 
-        $this->assertEquals($requests, $limiter->getRequests());
-        $this->assertEquals($perSecond, $limiter->getPerSecond());
+        $this->assertSame(10, $limiter->getRequests());
+        $this->assertSame(20, $limiter->getPerSecond());
     }
 
-    public function testSetStorageKey(): void
+    /**
+     * Asserts that setStorageKey formats the storage key correctly using the given identifier.
+     */
+    public function testSetStorageKeyFormatsKeyWithIdentifier(): void
     {
-        $identifier = 'test-set-storage-key';
-        $storageKey = 'api:limit:%s';
+        $limiter = new Limiter($this->client, 'test-set-storage-key');
+        $limiter->setStorageKey('api:limit:%s');
 
-        $limiter = new Limiter($this->client, $identifier);
-        $limiter->setStorageKey($storageKey);
-
-        $this->assertEquals('api:limit:test-set-storage-key', $limiter->getStorageKey());
+        $this->assertSame('api:limit:test-set-storage-key', $limiter->getStorageKey());
     }
 }

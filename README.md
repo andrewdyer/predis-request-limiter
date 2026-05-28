@@ -1,51 +1,114 @@
-<h1 align="center">Predis Request Limiter</h1>
-
-<p align="center">Request rate limiting using Predis.</p>
+![Predis Request Limiter](https://public-assets.andrewdyer.rocks/images/covers/predis-request-limiter.png)
 
 <p align="center">
-    <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/downloads?style=for-the-badge" alt="Total Downloads"></a>
-    <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/v?style=for-the-badge" alt="Latest Stable Version"></a>
-    <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/license?style=for-the-badge" alt="License"></a>
+  <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/v/stable?style=for-the-badge" alt="Latest Stable Version"></a>
+  <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/downloads?style=for-the-badge" alt="Total Downloads"></a>
+  <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/license?style=for-the-badge" alt="License"></a>
+  <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/require/php?style=for-the-badge" alt="PHP Version Required"></a>
 </p>
 
-## License
+<p align="center">
+  Built on top of <a href="https://github.com/andrewdyer/php-package-template">andrewdyer/php-package-template</a>
+</p>
 
-Licensed under MIT. Totally free for private or commercial projects.
+# Predis Request Limiter
+
+A framework-agnostic PHP library for rate limiting requests using [Predis](https://github.com/predis/predis).
+
+## Introduction
+
+This library provides a request rate limiter for PHP applications, backed by Redis via Predis. The rate limit window, request threshold, storage key, and limit exceeded handler are all configurable, and any Predis-compatible client can be used as the backing store.
+
+## Prerequisites
+
+- **[PHP](https://www.php.net/)**: Version 8.3 or higher is required.
+- **[Composer](https://getcomposer.org/)**: Dependency management tool for PHP.
+- **[Redis](https://redis.io/)**: A running Redis instance is required.
 
 ## Installation
 
-```text
+```bash
 composer require andrewdyer/predis-request-limiter
+```
+
+## Getting Started
+
+### 1. Create a Predis client
+
+```php
+use Predis\Client;
+
+$client = new Client([
+    'scheme' => 'tcp',
+    'host'   => '127.0.0.1',
+    'port'   => 6379,
+]);
+```
+
+### 2. Create a limiter
+
+Instantiate `Limiter` with a Predis client and a unique identifier. The identifier is interpolated into the storage key to namespace requests per user, IP, or endpoint:
+
+```php
+use AndrewDyer\PredisRequestLimiter\Limiter;
+
+$limiter = new Limiter($client, '127.0.0.1');
+```
+
+### 3. Configure the rate limit
+
+Set the maximum number of requests and the time window in seconds:
+
+```php
+$limiter->setRateLimit(requests: 10, perSecond: 60);
 ```
 
 ## Usage
 
+### Checking and incrementing
+
+Check whether the limit has been exceeded before incrementing the request count:
+
 ```php
-// Create new predis client instance
-$predis = new Predis\Client();
-
-// Create new limiter instance
-$limiter = new Anddye\PredisRequestLimiter\Limiter($predis, 100);
-$limiter->setRateLimit(10, 30)
-    ->setStorageKey('api:limit:%s');
-
 if ($limiter->hasExceededRateLimit()) {
-    // Too many requests has been made, display error message
+    // Limit exceeded — respond with 429 or invoke the handler
 } else {
     $limiter->incrementRequestCount();
 }
 ```
 
-## Support
-   
-If you are having any issues with this library, then please feel free to contact me on [Twitter](https://twitter.com/andyer92).
+### Setting a limit exceeded handler
 
-If you think you've found an bug, please report it using the [issue tracker](https://github.com/andrewdyer/predis-request-limiter/issues), or better yet, fork the repository and submit a pull request.
+Register a callable to invoke when the limit is exceeded:
 
-If you're using this package, I'd love to hear your thoughts!
+```php
+$limiter->setLimitExceededHandler(function (): void {
+    http_response_code(429);
+    echo 'Too many requests.';
+    exit;
+});
+```
 
-## Useful Links
+Then invoke it when the limit is exceeded:
 
-*   [Redis](http://redis.io/)
-*   [Predis](https://github.com/nrk/predis)
-*   [Predis Adaptor](https://github.com/andrewdyer/predis-request-limiter)
+```php
+if ($limiter->hasExceededRateLimit()) {
+    ($limiter->getLimitExceededHandler())();
+} else {
+    $limiter->incrementRequestCount();
+}
+```
+
+### Customising the storage key
+
+The default storage key template is `rate:%s:requests`, where `%s` is replaced by the identifier. Override it to namespace keys differently:
+
+```php
+$limiter->setStorageKey('api:limit:%s');
+```
+
+With the identifier `127.0.0.1`, the resolved key becomes `api:limit:127.0.0.1`.
+
+## License
+
+Licensed under the [MIT licence](https://opensource.org/licenses/MIT) and is free for private or commercial projects.

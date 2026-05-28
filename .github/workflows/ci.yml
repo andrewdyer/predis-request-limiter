@@ -1,0 +1,14 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  php-test:
+    name: PHP test
+    uses: andrewdyer/github-workflows/.github/workflows/php-test.yml@main

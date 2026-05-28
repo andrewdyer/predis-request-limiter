@@ -1,69 +1,66 @@
 <?php
 
-namespace Anddye\PredisRequestLimiter;
+declare(strict_types=1);
 
-use Predis\Client;
+namespace AndrewDyer\PredisRequestLimiter;
 
+use Predis\ClientInterface;
+
+/**
+ * Handles request rate limiting using a Redis-backed counter.
+ */
 class Limiter
 {
     /**
-     * Client class used for connecting and executing commands on Redis.
+     * The configured limit exceeded handler.
+     *
+     * @var callable|null
      */
-    private Client $client;
+    private $limitExceededHandler = null;
 
     /**
-     * The unique identifier to use within the storage key.
-     */
-    private string $identifier;
-
-    /**
-     * The limit exceeded handler.
-     */
-    private $limitExceededHandler;
-
-    /**
-     * The time limit that the defined requests can be made within.
+     * The time window in seconds within which the request limit applies.
      */
     private int $perSecond = 60;
 
     /**
-     * Requests that can be made as per the time limit.
+     * The maximum number of requests allowed within the time window.
      */
     private int $requests = 30;
 
     /**
-     * The storage key used for the Redis store.
+     * The storage key template used for the Redis store.
      */
     private string $storageKey = 'rate:%s:requests';
 
     /**
-     * @param Client $client     client class used for connecting and executing commands on Redis
-     * @param string $identifier unique identifier to use within the storage key
+     * Creates a new Limiter with the required dependencies.
+     *
+     * @param ClientInterface $client The Predis client instance.
+     * @param string $identifier The unique identifier for the storage key.
      */
-    public function __construct(Client $client, string $identifier)
-    {
-        $this->client = $client;
-        $this->identifier = $identifier;
+    public function __construct(
+        private readonly ClientInterface $client,
+        private readonly string $identifier,
+    ) {
+        $this->limitExceededHandler = static function(): void {
+        };
     }
 
     /**
-     * The default limit exceeded handler.
+     * Returns the Predis client instance.
+     *
+     * @return ClientInterface The Predis client.
      */
-    public function defaultLimitExceededHandler(): callable
-    {
-        return function () {};
-    }
-
-    /**
-     * Get Client class used for connecting and executing commands on Redis.
-     */
-    public function getClient(): Client
+    public function getClient(): ClientInterface
     {
         return $this->client;
     }
 
     /**
-     * Get unique identifier to use within the storage key.
+     * Returns the unique identifier used within the storage key.
+     *
+     * @return string The identifier.
      */
     public function getIdentifier(): string
     {
@@ -71,19 +68,19 @@ class Limiter
     }
 
     /**
-     * Get the limit exceeded handler.
+     * Returns the configured limit exceeded handler, or the default if none has been set.
+     *
+     * @return callable The limit exceeded handler.
      */
     public function getLimitExceededHandler(): callable
     {
-        if (!$this->limitExceededHandler) {
-            return $this->defaultLimitExceededHandler();
-        }
-
         return $this->limitExceededHandler;
     }
 
     /**
-     * Get the time limit that the defined requests can be made within.
+     * Returns the time window in seconds within which the request limit applies.
+     *
+     * @return int The time window in seconds.
      */
     public function getPerSecond(): int
     {
@@ -91,7 +88,9 @@ class Limiter
     }
 
     /**
-     * Get requests that can be made as per the time limit.
+     * Returns the maximum number of requests allowed within the time window.
+     *
+     * @return int The request limit.
      */
     public function getRequests(): int
     {
@@ -99,39 +98,39 @@ class Limiter
     }
 
     /**
-     * Get storage key.
+     * Returns the formatted Redis storage key for this limiter instance.
+     *
+     * @return string The storage key.
      */
     public function getStorageKey(): string
     {
-        return sprintf($this->storageKey, $this->getIdentifier());
+        return sprintf($this->storageKey, $this->identifier);
     }
 
     /**
-     * Check if the rate limit has been exceeded.
+     * Determines whether the rate limit has been exceeded.
+     *
+     * @return bool True if the limit has been exceeded, false otherwise.
      */
     public function hasExceededRateLimit(): bool
     {
-        if ($this->getClient()->get($this->getStorageKey()) >= $this->getRequests()) {
-            return true;
-        }
-
-        return false;
+        return $this->client->get($this->getStorageKey()) >= $this->requests;
     }
 
     /**
-     * Increment the request count.
+     * Handles incrementing the request count and refreshing the TTL window.
      */
     public function incrementRequestCount(): void
     {
-        $this->getClient()->incr($this->getStorageKey());
-
-        $this->getClient()->expire($this->getStorageKey(), $this->getPerSecond());
+        $this->client->incr($this->getStorageKey());
+        $this->client->expire($this->getStorageKey(), $this->perSecond);
     }
 
     /**
-     * Set limit exceeded handler.
+     * Registers a custom limit exceeded handler.
      *
-     * @param callable $limitExceededHandler the limit exceeded handler
+     * @param callable $limitExceededHandler The handler to invoke when the limit is exceeded.
+     * @return self The current instance for method chaining.
      */
     public function setLimitExceededHandler(callable $limitExceededHandler): self
     {
@@ -141,10 +140,11 @@ class Limiter
     }
 
     /**
-     * Set rate limit.
+     * Registers the rate limit configuration.
      *
-     * @param int $requests  requests that can be made as per the time limit
-     * @param int $perSecond the time limit that the defined requests can be made within
+     * @param int $requests The maximum number of requests allowed within the time window.
+     * @param int $perSecond The time window in seconds.
+     * @return self The current instance for method chaining.
      */
     public function setRateLimit(int $requests, int $perSecond): self
     {
@@ -155,9 +155,10 @@ class Limiter
     }
 
     /**
-     * set storage key.
+     * Registers the storage key template.
      *
-     * @param string $storageKey the storage key used for the Redis store
+     * @param string $storageKey The key template, which must contain a %s placeholder for the identifier.
+     * @return self The current instance for method chaining.
      */
     public function setStorageKey(string $storageKey): self
     {
