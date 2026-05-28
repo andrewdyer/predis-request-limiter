@@ -38,6 +38,16 @@ final class LimiterTest extends TestCase
     }
 
     /**
+     * Asserts that repeated calls to getLimitExceededHandler return the same callable instance.
+     */
+    public function testGetLimitExceededHandlerReturnsSameInstanceOnRepeatedCalls(): void
+    {
+        $limiter = new Limiter($this->client, 'test-same-handler-instance');
+
+        $this->assertSame($limiter->getLimitExceededHandler(), $limiter->getLimitExceededHandler());
+    }
+
+    /**
      * Asserts that hasExceededRateLimit returns false while the request count is below the configured limit.
      */
     public function testHasExceededRateLimitReturnsFalseBeforeLimitReached(): void

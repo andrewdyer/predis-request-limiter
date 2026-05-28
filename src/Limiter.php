@@ -43,6 +43,8 @@ class Limiter
         private readonly ClientInterface $client,
         private readonly string $identifier,
     ) {
+        $this->limitExceededHandler = static function(): void {
+        };
     }
 
     /**
@@ -72,8 +74,7 @@ class Limiter
      */
     public function getLimitExceededHandler(): callable
     {
-        return $this->limitExceededHandler ?? static function(): void {
-        };
+        return $this->limitExceededHandler;
     }
 
     /**
