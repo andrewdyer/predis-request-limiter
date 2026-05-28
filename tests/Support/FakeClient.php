@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AndrewDyer\PredisRequestLimiter\Tests\Support;
 
 use Predis\ClientInterface;
@@ -28,15 +30,15 @@ class FakeClient implements ClientInterface
     {
         return match (strtolower($method)) {
             'get' => isset($this->storage[$arguments[0]])
-            ? (string) $this->storage[$arguments[0]]
+            ? (string)$this->storage[$arguments[0]]
             : null,
             'incr' => $this->storage[$arguments[0]] = ($this->storage[$arguments[0]] ?? 0) + 1,
             'expire' => 1,
-            'flushall' => (function () {
-                    $this->storage = [];
+            'flushall' => (function() {
+                $this->storage = [];
 
-                    return 'OK';
-                })(),
+                return 'OK';
+            })(),
             default => null,
         };
     }
