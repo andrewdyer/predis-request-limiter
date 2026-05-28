@@ -8,6 +8,10 @@
     <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/license?style=for-the-badge" alt="License"></a>
 </p>
 
+<p align="center">
+  Built on top of <a href="https://github.com/andrewdyer/php-package-template">andrewdyer/php-package-template</a>
+</p>
+
 ## License
 
 Licensed under MIT. Totally free for private or commercial projects.
