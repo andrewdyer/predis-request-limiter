@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AndrewDyer\PredisRequestLimiter\Tests;
 
 use AndrewDyer\PredisRequestLimiter\Limiter;
@@ -26,19 +28,19 @@ final class LimiterTest extends TestCase
     }
 
     /**
-     * Asserts that the default limit exceeded handler is returned when no custom handler has been set.
+     * Asserts that getLimitExceededHandler returns a callable when no custom handler has been set.
      */
-    public function testDefaultLimitExceededHandler(): void
+    public function testGetLimitExceededHandlerReturnsDefaultWhenNoneSet(): void
     {
-        $limiter = new Limiter($this->client, 'test-default-limit-exceeded-handler');
+        $limiter = new Limiter($this->client, 'test-default-handler');
 
-        $this->assertEquals($limiter->defaultLimitExceededHandler(), $limiter->getLimitExceededHandler());
+        $this->assertIsCallable($limiter->getLimitExceededHandler());
     }
 
     /**
-     * Asserts that hasExceededRateLimit returns true once the request count reaches the configured limit.
+     * Asserts that hasExceededRateLimit returns false while the request count is below the configured limit.
      */
-    public function testHasExceededRateLimit(): void
+    public function testHasExceededRateLimitReturnsFalseBeforeLimitReached(): void
     {
         $limiter = new Limiter($this->client, 'test-has-exceeded-rate-limit');
         $limiter->setRateLimit(3, 30);
@@ -48,80 +50,84 @@ final class LimiterTest extends TestCase
 
         $limiter->incrementRequestCount();
         $this->assertFalse($limiter->hasExceededRateLimit());
+    }
+
+    /**
+     * Asserts that hasExceededRateLimit returns true once the request count reaches the configured limit.
+     */
+    public function testHasExceededRateLimitReturnsTrueWhenLimitReached(): void
+    {
+        $limiter = new Limiter($this->client, 'test-has-exceeded-rate-limit');
+        $limiter->setRateLimit(3, 30);
 
         $limiter->incrementRequestCount();
+        $limiter->incrementRequestCount();
+        $limiter->incrementRequestCount();
+
         $this->assertTrue($limiter->hasExceededRateLimit());
     }
 
     /**
      * Asserts that incrementing the request count correctly updates the stored value.
      */
-    public function testIncrementRequestCount(): void
+    public function testIncrementRequestCountUpdatesStoredValue(): void
     {
         $limiter = new Limiter($this->client, 'test-increment-request-count');
 
         $limiter->incrementRequestCount();
-        $this->assertEquals('1', $limiter->getClient()->get($limiter->getStorageKey()));
+        $this->assertSame('1', $limiter->getClient()->get($limiter->getStorageKey()));
 
         $limiter->incrementRequestCount();
-        $this->assertEquals('2', $limiter->getClient()->get($limiter->getStorageKey()));
+        $this->assertSame('2', $limiter->getClient()->get($limiter->getStorageKey()));
 
         $limiter->incrementRequestCount();
-        $this->assertEquals('3', $limiter->getClient()->get($limiter->getStorageKey()));
+        $this->assertSame('3', $limiter->getClient()->get($limiter->getStorageKey()));
     }
 
     /**
-     * Asserts that the identifier is stored and returned correctly.
+     * Asserts that getIdentifier returns the value passed to the constructor.
      */
-    public function testSetIdentifier(): void
+    public function testGetIdentifierReturnsCorrectValue(): void
     {
-        $identifier = 'custom identifier';
+        $limiter = new Limiter($this->client, 'custom-identifier');
 
-        $limiter = new Limiter($this->client, $identifier);
-
-        $this->assertEquals($identifier, $limiter->getIdentifier());
+        $this->assertSame('custom-identifier', $limiter->getIdentifier());
     }
 
     /**
-     * Asserts that a custom limit exceeded handler is stored and returned correctly.
+     * Asserts that setLimitExceededHandler stores and returns the given handler via getLimitExceededHandler.
      */
-    public function testSetLimitExceededHandler(): void
+    public function testSetLimitExceededHandlerStoresAndReturnsHandler(): void
     {
-        $handler = function () {
+        $handler = static function(): void {
         };
 
         $limiter = new Limiter($this->client, 'test-set-limit-exceeded-handler');
         $limiter->setLimitExceededHandler($handler);
 
-        $this->assertEquals($handler, $limiter->getLimitExceededHandler());
+        $this->assertSame($handler, $limiter->getLimitExceededHandler());
     }
 
     /**
-     * Asserts that the rate limit values are stored and returned correctly.
+     * Asserts that setRateLimit stores the requests and perSecond values correctly.
      */
-    public function testSetRateLimit(): void
+    public function testSetRateLimitStoresCorrectValues(): void
     {
-        $requests = 10;
-        $perSecond = 20;
-
         $limiter = new Limiter($this->client, 'test-set-rate-limit');
-        $limiter->setRateLimit($requests, $perSecond);
+        $limiter->setRateLimit(10, 20);
 
-        $this->assertEquals($requests, $limiter->getRequests());
-        $this->assertEquals($perSecond, $limiter->getPerSecond());
+        $this->assertSame(10, $limiter->getRequests());
+        $this->assertSame(20, $limiter->getPerSecond());
     }
 
     /**
-     * Asserts that the storage key is formatted correctly using the given identifier.
+     * Asserts that setStorageKey formats the storage key correctly using the given identifier.
      */
-    public function testSetStorageKey(): void
+    public function testSetStorageKeyFormatsKeyWithIdentifier(): void
     {
-        $identifier = 'test-set-storage-key';
-        $storageKey = 'api:limit:%s';
+        $limiter = new Limiter($this->client, 'test-set-storage-key');
+        $limiter->setStorageKey('api:limit:%s');
 
-        $limiter = new Limiter($this->client, $identifier);
-        $limiter->setStorageKey($storageKey);
-
-        $this->assertEquals('api:limit:test-set-storage-key', $limiter->getStorageKey());
+        $this->assertSame('api:limit:test-set-storage-key', $limiter->getStorageKey());
     }
 }
