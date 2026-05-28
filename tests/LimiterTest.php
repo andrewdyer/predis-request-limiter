@@ -3,23 +3,16 @@
 namespace Anddye\PredisRequestLimiter\Tests;
 
 use Anddye\PredisRequestLimiter\Limiter;
+use Anddye\PredisRequestLimiter\Tests\Support\FakeClient;
 use PHPUnit\Framework\TestCase;
-use Predis\Client;
 
 final class LimiterTest extends TestCase
 {
-    private Client $client;
+    private FakeClient $client;
 
     protected function setUp(): void
     {
-        $parameters = [
-            'scheme' => 'tcp',
-            'host' => '127.0.0.1',
-            'port' => '6379',
-            'password' => '',
-        ];
-
-        $this->client = new Client($parameters);
+        $this->client = new FakeClient();
         $this->client->flushall();
     }
 
@@ -70,7 +63,8 @@ final class LimiterTest extends TestCase
 
     public function testSetLimitExceededHandler(): void
     {
-        $handler = function () {};
+        $handler = function() {
+        };
 
         $limiter = new Limiter($this->client, 'test-set-limit-exceeded-handler');
         $limiter->setLimitExceededHandler($handler);
