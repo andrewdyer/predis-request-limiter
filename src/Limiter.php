@@ -1,8 +1,8 @@
 <?php
 
-namespace Anddye\PredisRequestLimiter;
+namespace AndrewDyer\PredisRequestLimiter;
 
-use Predis\Client;
+use Predis\ClientInterface;
 
 class Limiter
 {
@@ -51,7 +51,8 @@ class Limiter
      */
     public function defaultLimitExceededHandler(): callable
     {
-        return function () {};
+        return function () {
+        };
     }
 
     /**
@@ -143,7 +144,7 @@ class Limiter
     /**
      * Set rate limit.
      *
-     * @param int $requests  requests that can be made as per the time limit
+     * @param int $requests requests that can be made as per the time limit
      * @param int $perSecond the time limit that the defined requests can be made within
      */
     public function setRateLimit(int $requests, int $perSecond): self

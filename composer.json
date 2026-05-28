@@ -24,12 +24,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Anddye\\PredisRequestLimiter\\": "src/"
+      "AndrewDyer\\PredisRequestLimiter\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Anddye\\PredisRequestLimiter\\Tests\\": "tests/"
+      "AndrewDyer\\PredisRequestLimiter\\Tests\\": "tests/"
     }
   },
   "require": {

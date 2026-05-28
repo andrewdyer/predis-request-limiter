@@ -1,9 +1,9 @@
 <?php
 
-namespace Anddye\PredisRequestLimiter\Tests;
+namespace AndrewDyer\PredisRequestLimiter\Tests;
 
-use Anddye\PredisRequestLimiter\Limiter;
-use Anddye\PredisRequestLimiter\Tests\Support\FakeClient;
+use AndrewDyer\PredisRequestLimiter\Limiter;
+use AndrewDyer\PredisRequestLimiter\Tests\Support\FakeClient;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -87,7 +87,7 @@ final class LimiterTest extends TestCase
      */
     public function testSetLimitExceededHandler(): void
     {
-        $handler = function() {
+        $handler = function () {
         };
 
         $limiter = new Limiter($this->client, 'test-set-limit-exceeded-handler');
