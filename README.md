@@ -13,7 +13,7 @@
 
 # Predis Request Limiter
 
-A framework-agnostic PHP library for rate limiting requests using Redis via Predis.
+A framework-agnostic PHP library for rate limiting requests using Redis.
 
 ## Introduction
 
