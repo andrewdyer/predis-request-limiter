@@ -1,4 +1,4 @@
-
+![Predis Request Limiter](https://public-assets.andrewdyer.rocks/images/covers/predis-request-limiter.png)
 
 <p align="center">
     <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/downloads?style=for-the-badge" alt="Total Downloads"></a>
