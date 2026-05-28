@@ -1,6 +1,6 @@
 {
   "name": "andrewdyer/predis-request-limiter",
-  "description": "Request rate limiting using Predis.",
+  "description": "A framework-agnostic PHP library for rate limiting requests using [Predis](https://github.com/predis/predis)",
   "keywords": [
     "php",
     "redis",
