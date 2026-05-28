@@ -1,9 +1,10 @@
 ![Predis Request Limiter](https://public-assets.andrewdyer.rocks/images/covers/predis-request-limiter.png)
 
 <p align="center">
-    <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/downloads?style=for-the-badge" alt="Total Downloads"></a>
-    <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/v?style=for-the-badge" alt="Latest Stable Version"></a>
-    <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/license?style=for-the-badge" alt="License"></a>
+  <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/v/stable?style=for-the-badge" alt="Latest Stable Version"></a>
+  <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/downloads?style=for-the-badge" alt="Total Downloads"></a>
+  <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/license?style=for-the-badge" alt="License"></a>
+  <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/require/php?style=for-the-badge" alt="PHP Version Required"></a>
 </p>
 
 <p align="center">
