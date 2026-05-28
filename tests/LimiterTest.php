@@ -6,16 +6,28 @@ use Anddye\PredisRequestLimiter\Limiter;
 use Anddye\PredisRequestLimiter\Tests\Support\FakeClient;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Unit tests for Limiter.
+ */
 final class LimiterTest extends TestCase
 {
+    /**
+     * The fake Predis client used across tests.
+     */
     private FakeClient $client;
 
+    /**
+     * Sets up the test environment before each test.
+     */
     protected function setUp(): void
     {
         $this->client = new FakeClient();
         $this->client->flushall();
     }
 
+    /**
+     * Asserts that the default limit exceeded handler is returned when no custom handler has been set.
+     */
     public function testDefaultLimitExceededHandler(): void
     {
         $limiter = new Limiter($this->client, 'test-default-limit-exceeded-handler');
@@ -23,6 +35,9 @@ final class LimiterTest extends TestCase
         $this->assertEquals($limiter->defaultLimitExceededHandler(), $limiter->getLimitExceededHandler());
     }
 
+    /**
+     * Asserts that hasExceededRateLimit returns true once the request count reaches the configured limit.
+     */
     public function testHasExceededRateLimit(): void
     {
         $limiter = new Limiter($this->client, 'test-has-exceeded-rate-limit');
@@ -38,6 +53,9 @@ final class LimiterTest extends TestCase
         $this->assertTrue($limiter->hasExceededRateLimit());
     }
 
+    /**
+     * Asserts that incrementing the request count correctly updates the stored value.
+     */
     public function testIncrementRequestCount(): void
     {
         $limiter = new Limiter($this->client, 'test-increment-request-count');
@@ -52,6 +70,9 @@ final class LimiterTest extends TestCase
         $this->assertEquals('3', $limiter->getClient()->get($limiter->getStorageKey()));
     }
 
+    /**
+     * Asserts that the identifier is stored and returned correctly.
+     */
     public function testSetIdentifier(): void
     {
         $identifier = 'custom identifier';
@@ -61,6 +82,9 @@ final class LimiterTest extends TestCase
         $this->assertEquals($identifier, $limiter->getIdentifier());
     }
 
+    /**
+     * Asserts that a custom limit exceeded handler is stored and returned correctly.
+     */
     public function testSetLimitExceededHandler(): void
     {
         $handler = function() {
@@ -72,6 +96,9 @@ final class LimiterTest extends TestCase
         $this->assertEquals($handler, $limiter->getLimitExceededHandler());
     }
 
+    /**
+     * Asserts that the rate limit values are stored and returned correctly.
+     */
     public function testSetRateLimit(): void
     {
         $requests = 10;
@@ -84,6 +111,9 @@ final class LimiterTest extends TestCase
         $this->assertEquals($perSecond, $limiter->getPerSecond());
     }
 
+    /**
+     * Asserts that the storage key is formatted correctly using the given identifier.
+     */
     public function testSetStorageKey(): void
     {
         $identifier = 'test-set-storage-key';
