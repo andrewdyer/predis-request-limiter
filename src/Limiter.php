@@ -9,7 +9,7 @@ class Limiter
     /**
      * Client class used for connecting and executing commands on Redis.
      */
-    private Client $client;
+    private ClientInterface $client;
 
     /**
      * The unique identifier to use within the storage key.
@@ -37,10 +37,10 @@ class Limiter
     private string $storageKey = 'rate:%s:requests';
 
     /**
-     * @param Client $client     client class used for connecting and executing commands on Redis
+     * @param ClientInterface $client client class used for connecting and executing commands on Redis
      * @param string $identifier unique identifier to use within the storage key
      */
-    public function __construct(Client $client, string $identifier)
+    public function __construct(ClientInterface $client, string $identifier)
     {
         $this->client = $client;
         $this->identifier = $identifier;
@@ -57,7 +57,7 @@ class Limiter
     /**
      * Get Client class used for connecting and executing commands on Redis.
      */
-    public function getClient(): Client
+    public function getClient(): ClientInterface
     {
         return $this->client;
     }
