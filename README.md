@@ -1,23 +1,15 @@
-![Predis Request Limiter](https://public-assets.andrewdyer.rocks/images/covers/predis-request-limiter.png)
-
-<p align="center">
-  <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/v/stable?style=for-the-badge" alt="Latest Stable Version"></a>
-  <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/downloads?style=for-the-badge" alt="Total Downloads"></a>
-  <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/license?style=for-the-badge" alt="License"></a>
-  <a href="https://packagist.org/packages/andrewdyer/predis-request-limiter"><img src="https://poser.pugx.org/andrewdyer/predis-request-limiter/require/php?style=for-the-badge" alt="PHP Version Required"></a>
-</p>
-
-<p align="center">
-  Built on top of <a href="https://github.com/andrewdyer/php-package-template">andrewdyer/php-package-template</a>
-</p>
-
 # Predis Request Limiter
 
 A framework-agnostic PHP library for rate limiting requests using [Predis](https://github.com/predis/predis).
 
+[![Latest Stable Version](http://poser.pugx.org/andrewdyer/predis-request-limiter/v?style=flat-square)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
+[![Total Downloads](http://poser.pugx.org/andrewdyer/predis-request-limiter/downloads?style=flat-square)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
+[![License](http://poser.pugx.org/andrewdyer/predis-request-limiter/license?style=flat-square)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
+[![PHP Version Require](http://poser.pugx.org/andrewdyer/predis-request-limiter/require/php?style=flat-square)](https://packagist.org/packages/andrewdyer/predis-request-limiter)
+
 ## Introduction
 
-This library provides a request rate limiter for PHP applications, backed by Redis via Predis. The rate limit window, request threshold, storage key, and limit exceeded handler are all configurable, and any Predis-compatible client can be used as the backing store.
+This library provides a request rate limiter for PHP applications, backed by Redis via Predis. The rate limit window, request threshold, storage key, and limit exceeded handler are all configurable, and any Predis-compatible client can be used as the backing store. The package is built on top of [andrewdyer/php-package-template](https://github.com/andrewdyer/php-package-template).
 
 ## Prerequisites
 
